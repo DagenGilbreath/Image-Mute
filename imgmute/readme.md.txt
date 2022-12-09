@@ -1,1 +1,0 @@
-Need Tessaract OCR installed to run script. 
