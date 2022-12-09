@@ -2,9 +2,6 @@
 import cv2
 import pytesseract
 
-# Tesseract-OCR
-pytesseract.pytesseract.tesseract_cmd = r'C:\Users\dgilbreath\AppData\Local\Tesseract-OCR\tesseract.exe'
-
 def readImg(dir, image):
     print(image)
 
