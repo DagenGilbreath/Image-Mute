@@ -11,34 +11,34 @@ import sys
 from imgOcr import readImg
 import pytesseract
 
-# Pytesseract directory from arg
-pytdir = sys.argv[1]
-print(pytdir)
-
-# Tesseract-OCR
-# pytesseract.pytesseract.tesseract_cmd = r'C:\Users\dgilbreath\AppData\Local\Tesseract-OCR\tesseract.exe'
-pytesseract.pytesseract.tesseract_cmd = pytdir
-
 # image directory
 dir = r'scrape/'
 
-# Key to search image text
-key = "Text"
+# Pytesseract directory from arg
+pytdir = sys.argv[1]
 
-# Remove white space (simplify formatting)
-key = key.replace(" ", "").lower()
+# Keys to search images for (comma separated)
+keys = sys.argv[2].split(',')
 
-# TODO: Scrape images (maybe check if text is present at all before going forward)
+# Tesseract-OCR
+pytesseract.pytesseract.tesseract_cmd = pytdir
 
-# TODO: use while loop once images are being continusouly pulled
+# Simplify keys to search image text
+for i in range(len(keys)):
+    keys[i] = keys[i].replace(" ", "").lower()
+
+# Loop through images in dir and check for key in imStr
+# TODO: Scrape images (maybe check if text is present in image before going forward)
+# TODO: edit logic to account for images being continusouly pulled (pull img into /scrape, while scrape has images, delete image once found / muted)
 for image in os.listdir(dir):
     # readImg uses OCR to read text on image and return string with text found (no spaces lowercase)
-    s = readImg(dir, image)
+    imStr = readImg(dir, image)
     
     # Search for key
-    if key in s:
-        print("found!")
-        
-        # TODO: Call block func?
+    for key in keys:
+        if key in imStr:
+            print("found key '" + key + "' in text '" + imStr +"'")
+            print("muting image " + image + "...")
+            # TODO: Call block func?
     
     # TODO: remove / delete image from folder? 
