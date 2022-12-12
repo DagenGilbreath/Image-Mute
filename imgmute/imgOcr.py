@@ -3,8 +3,6 @@ import cv2
 import pytesseract
 
 def readImg(dir, image):
-    print(image)
-
     # Read image from which text needs to be extracted
     img = cv2.imread(dir+image)
 
@@ -55,6 +53,5 @@ def readImg(dir, image):
         # Add text to string
         imStr += imText
 
-    # Format img text
-    imStr = imStr.replace("\n", "").replace(" ", "").lower()
+    
     return imStr

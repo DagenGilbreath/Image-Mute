@@ -23,7 +23,7 @@ keys = sys.argv[2].split(',')
 # Tesseract-OCR
 pytesseract.pytesseract.tesseract_cmd = pytdir
 
-# Simplify keys to search image text
+# Format keys
 for i in range(len(keys)):
     keys[i] = keys[i].replace(" ", "").lower()
 
@@ -31,14 +31,21 @@ for i in range(len(keys)):
 # TODO: Scrape images (maybe check if text is present in image before going forward)
 # TODO: edit logic to account for images being continusouly pulled (pull img into /scrape, while scrape has images, delete image once found / muted)
 for image in os.listdir(dir):
-    # readImg uses OCR to read text on image and return string with text found (no spaces lowercase)
+    print("Scanning " + image + "...\n------------------------------------------------\n")
+
+    # readImg uses OCR to read text on image and return string with text found
     imStr = readImg(dir, image)
+
+    print("Content: \n\n" + imStr + "\n------------------------------------------------")
     
+    # Format img text for key search
+    imStr = imStr.replace("\n", "").replace(" ", "").lower()
+
     # Search for key
     for key in keys:
         if key in imStr:
-            print("found key '" + key + "' in text '" + imStr +"'")
-            print("muting image " + image + "...")
+            print("Found prase: '" + key + "' in image: '" + image 
+            + "'\nMuting image: " + image + "...\n------------------------------------------------")
             # TODO: Call block func?
     
     # TODO: remove / delete image from folder? 
