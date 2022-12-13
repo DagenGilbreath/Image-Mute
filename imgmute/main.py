@@ -1,51 +1,80 @@
-# scrape images on timeline
-# search for text in key on image
-# "im not interested in this tweet" - mutes tweet (hopefully before you see it)
-# TODO: Loop as long as session is open
-# TODO: integrate twitter API?
-# TODO: flesh out
-
 # Import required packages
+import argparse
 import os
 import sys
-from imgOcr import readImg
+import re
 import pytesseract
+from imgOcr import readImg
+
+# TODO: fix args currently not working
+
+# Optional args
+parser = argparse.ArgumentParser(
+    prog = "ImageMute",
+    description = "Mute images on Twitter based on text content found within",
+    epilog = "Built with OpenCV and beautifulsoup"
+)
+parser.add_argument('-c', '--caseSensitive', help='Parse text / phrase with case sensitivity', action='store_true')
+parser.add_argument('pytdir', help='The directory of Pytesseract.exe')
+parser.add_argument('searchKeys', help='Phrases to search image text content for in order to mute the image. Surround each phrase in quotes and seperate with commas.')
+args = parser.parse_args()
 
 # image directory
 dir = r'scrape/'
 
 # Pytesseract directory from arg
-pytdir = sys.argv[1]
-
-# Keys to search images for (comma separated)
-keys = sys.argv[2].split(',')
+pytdir = args.pytdir
 
 # Tesseract-OCR
 pytesseract.pytesseract.tesseract_cmd = pytdir
 
-# Format keys
-for i in range(len(keys)):
-    keys[i] = keys[i].replace(" ", "").lower()
+# Keys to search images for (comma separated)
+keys = args.searchKeys.split(',')
+# Copy list for output clarity
+ukeys = args.searchKeys.split(',')
 
-# Loop through images in dir and check for key in imStr
-# TODO: Scrape images (maybe check if text is present in image before going forward)
-# TODO: edit logic to account for images being continusouly pulled (pull img into /scrape, while scrape has images, delete image once found / muted)
-for image in os.listdir(dir):
-    print("Scanning " + image + "...\n------------------------------------------------\n")
+# Format keys according to args
+def formatKeys(keys):
+    if(not args.caseSensitive):
+        for i in range(len(keys)):
+            keys[i] = keys[i].lower()
+    return keys
 
-    # readImg uses OCR to read text on image and return string with text found
-    imStr = readImg(dir, image)
+# Format image text according to args
+def formatStr(imStr):
+    if(args.caseSensitive):
+        return imStr
+    else:
+        return imStr.lower()
 
-    print("Content: \n\n" + imStr + "\n------------------------------------------------")
-    
-    # Format img text for key search
-    imStr = imStr.replace("\n", "").replace(" ", "").lower()
+# dir: pytesseract directory
+# keys: search phrases specified in args
+# ukeys: copy of keys that keeps format for printing
+def search(dir, keys, ukeys):
+    # Loop through images in dir and check for key in imStr
+    for image in os.listdir(dir):
+        print("Scanning " + image + "...\n------------------------------------------------\n")
 
-    # Search for key
-    for key in keys:
-        if key in imStr:
-            print("Found prase: '" + key + "' in image: '" + image 
-            + "'\nMuting image: " + image + "...\n------------------------------------------------")
-            # TODO: Call block func?
-    
-    # TODO: remove / delete image from folder? 
+        # readImg uses OCR to read text on image and return string with text found
+        uStr = readImg(dir, image)
+
+        print("Raw image text content: \n\n" + uStr + "\n------------------------------------------------")
+        
+        # Format img text for key search
+        uStr = uStr.replace("\n", " ") # remove newlines
+        uStr = re.sub(' +', ' ', uStr) # remove extra spaces
+
+        # Modify iamge text based on args 
+        imStr = formatStr(uStr)
+        keys = formatKeys(keys)
+
+        # Search for key in text
+        for i in range(len(keys)):
+            if keys[i] in imStr:
+                print("Found prase: '" + ukeys[i] + "' in: '" + uStr 
+                + "'\nMuting image: " + image + "...\n------------------------------------------------")
+            else:
+                print("Couldn't find prase: '" + ukeys[i] + "' in: '" + uStr + "'...\n------------------------------------------------")
+            print("Details:\nCaseSensitive = " + str(args.caseSensitive)+ "\n------------------------------------------------")
+
+search(dir, keys, ukeys)
