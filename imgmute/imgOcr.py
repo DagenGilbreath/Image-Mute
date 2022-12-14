@@ -4,6 +4,8 @@ import os
 import cv2
 import pytesseract
 
+sep = "------------------------------------------------------"
+
 # Loop through the identified contours and write text to string
 def readContours(contours, img):
 
@@ -70,12 +72,15 @@ def formatStr(imStr, args):
 # search image and output results
 def search(dir, keys, ukeys, args, image):
     # Loop through images in dir and check for key in imStr
-    print("Scanning " + image + "...\n------------------------------------------------\n")
+    print(sep + "\nScanning " + image + "...\n" + sep + "\n")
 
     # readImg uses OCR to read text on image and return string with text found
     uStr = readImg(dir, image)
 
-    print("Raw image text content: \n\n" + uStr + "\n------------------------------------------------")
+    p = " Raw image text content: "
+    print (p.center(54, '_'))
+    print ("\n\n" + uStr)
+   
     
     # Format img text for key search
     uStr = uStr.replace("\n", " ") # remove newlines
@@ -88,10 +93,11 @@ def search(dir, keys, ukeys, args, image):
     # Search for key in text
     for i in range(len(keys)):
         if keys[i] in imStr:
-            print("Found prase: '" + ukeys[i] + "' in: '" + uStr 
-            + "'\nMuting image: " + image + "...\n------------------------------------------------")
+            print(sep + "\nFound prase: '" + ukeys[i] + "' in: '" + uStr 
+            + "'\nMuting image: " + image + "...\n" + sep)
             return image
         else:
-            print("Couldn't find prase: '" + ukeys[i] + "' in: '" + uStr + "'...\n------------------------------------------------")
-        print("Details:\nCaseSensitive = " + str(args.caseSensitive)+ "\n------------------------------------------------")
+            print("Couldn't find prase: '" + ukeys[i] + "' in: '" + uStr + "'..."
+            + sep)
+        print("Details:\nCaseSensitive = " + str(args.caseSensitive) + sep)
         return "NO_MUTE"

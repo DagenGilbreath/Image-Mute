@@ -45,6 +45,7 @@ ukeys = args.searchKeys.split(',')
 
 # Perform search on image (imgOcr.py)
 for image in os.listdir(dir):
+    # Searches for text and returns image name to be muted. Returns "NO_MUTE" if no matches for key
     result = search(dir, keys, ukeys, args, image)
     if result != "NO_MUTE":
         #TODO: implement mute func
